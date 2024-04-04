@@ -6,24 +6,18 @@
 ## Prerequisites 🛠️
 Packet Capture를 통해 `user_id`, `sso_token`, `terminal_id`, `user_ssid_info` 값을 추출해야 합니다.   
 
-### Android 🌌 
-
-------------
-
+## Android 🌌 
 
 1. [**Packet Capture**](https://play.google.com/store/apps/details?id=app.greyshirts.sslcapture) 를 설치합니다.  
 2. **Packet Capture**앱을 실행하고, 다원 AIPM 앱을 선택하여 시작버튼을 누릅니다.  
 3. **다원 AIPM 앱에서 로그인**을 시도합니다.  
-*Note) 자동로그인이 설정되어 있으면 로그아웃을 하지 않아도 됩니다.*
-4.  **Packet Capture** 앱으로 돌아와서 **다원 AIPM 앱을 선택**하고,** `PUT` `/api/v1/accounts/put/userSsid`** 요청 클릭하여 **Request Body**를 확인합니다.  
-5. ** `user_id`, `sso_token`, `terminal_id`, `user_ssid_info`** 값을 확인합니다.  
-6. 각 값들을 복사하여 **`settings.ini`** 파일에 붙여넣습니다.  
-*Note) **`settings_smaple.ini`** 파일의 이름을 **`settings.ini`**로 변경하여 사용합니다.*
+*Note) 자동로그인이 설정되어 있으면 로그아웃을 하지 않아도 됩니다.*  
+4.  **Packet Capture** 앱으로 돌아와서 **다원 AIPM 앱을 선택**하고, `PUT` `/api/v1/accounts/put/userSsid` 요청 클릭하여 **Request Body**를 확인합니다.  
+5.  `user_id`, `sso_token`, `terminal_id`, `user_ssid_info` 값을 확인합니다.  
+6.   각 값들을 복사하여 **`settings.ini`** 파일에 붙여넣습니다.  
+*Note) `settings_smaple.ini` 파일의 이름을 `settings.ini`으로 변경하여 사용합니다.*  
 
-### IOS 🍎
-
-------------
-
+## IOS 🍎
 
 1. [**Proxyman**](https://apps.apple.com/kr/app/proxyman-network-debug-tool/id1551292695)를 설치합니다.  
 2. [**공식문서**](https://docs.proxyman.io/debug-devices/ios-device)를 참고하여 초기설정을 합니다.  
@@ -31,8 +25,8 @@ Packet Capture를 통해 `user_id`, `sso_token`, `terminal_id`, `user_ssid_info`
 *Note) 자동로그인이 설정되어 있으면 로그아웃을 하지 않아도 됩니다.*
 4. Proxyman 앱으로 돌아와서 `dwapi.dawonai.com` 도메인을 선택하고 `PUT` `/api/v1/accounts/put/userSsid` 요청 클릭하여 **Request Body**를 확인합니다.  
 *Note) 만약 `Enable SSL Proxying` 버튼이 보인다면, 클릭하여 활성화한 후 3번 과정을 다시 진행합니다.*  
-5. **`user_id`, `sso_token`, `terminal_id`, `user_ssid_info`** 값을 확인하여 `settings.ini` 파일에 붙여넣습니다.  
-*Note) **`settings_smaple.ini`** 파일의 이름을 **`settings.ini`**로 변경하여 사용합니다.*  
+5. `user_id`, `sso_token`, `terminal_id`, `user_ssid_info` 값을 확인하여 `settings.ini` 파일에 붙여넣습니다.  
+*Note) `settings_smaple.ini` 파일의 이름을 `settings.ini`으로 변경하여 사용합니다.*  
 
 
 ## Installation 🚀
@@ -65,7 +59,7 @@ Packet Capture를 통해 `user_id`, `sso_token`, `terminal_id`, `user_ssid_info`
 ### Windows 🪟
 
 1. `run_windows.bat` 스크립트를 실행합니다.
-   ```bash
+```bash
 run_windows.bat
 ```  
 
@@ -105,10 +99,9 @@ run_windows.bat
         }
     ],
     "status": true
-}```  
-
+}
+```
 ------------
-
 
 ### 전원 제어
 
@@ -141,7 +134,8 @@ run_windows.bat
         "status": "devices/control/set : execute success"
     },
     "status": true
-}```  
+}
+```
 
 
 ## ⚠️ Disclaimer

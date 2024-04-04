@@ -16,6 +16,7 @@ pycparser==2.22
 requests==2.31.0
 urllib3==2.2.1
 websocket==0.2.1
+websocket-client==1.7.0
 Werkzeug==3.0.2
 zope.event==5.0
 zope.interface==6.2

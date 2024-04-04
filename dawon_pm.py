@@ -1,11 +1,13 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import requests
 import json
 import configparser
+import urllib3
 from websocket import create_connection
 import ssl
 
 app = Flask(__name__)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # 꼴보기 싫은 SSL 인증서 경고 무시
 
 # headers 는 session cookie를 발급받기 위한 초기 요청에 사용
 headers = {
@@ -52,7 +54,7 @@ def authenticate(only_authenticate_cookie=False):
     }
 
     # session cookie를 발급받기 위한 초기 요청 수행
-    response = requests.get('https://dwapi.dawonai.com:18443/iot2/', headers=headers)
+    response = requests.get('https://dwapi.dawonai.com:18443/iot2/', headers=headers, verify=False)
     response.raise_for_status()     # HTTP status code가 200이 아닌 경우 Exception 발생
     session_cookie = response.headers.get('Set-Cookie').split(';')[0]   # Set-Cookie 헤더에서 session cookie 추출
     headers['Cookie'] = session_cookie      # session cookie를 headers에 추가
@@ -67,11 +69,11 @@ def authenticate(only_authenticate_cookie=False):
             "user_ssid_info": user_ssid_info
         }
     }
-    response = requests.put('https://dwapi.dawonai.com:18443/api/v1/accounts/put/userSsid', data=json.dumps(put_data), headers=put_headers)
+    response = requests.put('https://dwapi.dawonai.com:18443/api/v1/accounts/put/userSsid', data=json.dumps(put_data), headers=put_headers, verify=False)
     response.raise_for_status()
     
     # 로그인 정보 전송
-    response = requests.post(login_url, data=login_data, headers=headers)
+    response = requests.post(login_url, data=login_data, headers=headers, verify=False)
     response.raise_for_status()
     
     # only_authenticate_cookie 가 True인 경우, [SUCCESS,session_cookie] 반환
@@ -80,14 +82,14 @@ def authenticate(only_authenticate_cookie=False):
     
     # WebSocket URI 및 인증 메시지 추출
     product_list_url = 'https://dwapi.dawonai.com:18443/iot2/product/productList.opi'
-    response = requests.get(product_list_url, headers={'Cookie': session_cookie})
+    response = requests.get(product_list_url, headers={'Cookie': session_cookie}, verify=False)
     body = response.text
     message = body.split('var message = "')[1].split('";')[0].strip('"')
     ws_uri = body.split('var wsUri = ')[1].split(';')[0].strip('"')
     
     # device_id 목록 추출
     device_list_url = 'https://dwapi.dawonai.com:18443/iot2/product/device_list.opi'
-    response = requests.get(device_list_url, headers={'Cookie': session_cookie})
+    response = requests.get(device_list_url, headers={'Cookie': session_cookie}, verify=False)
     device_id_list = json.loads(response.text)
     device_id_list = [device['device_id'] for device in device_id_list['devices']]  # device_id 목록 추출
     message_list = [message+";"+device_id for device_id in device_id_list]  # 인증 메시지와 device_id를 조합하여 message_list 생성
@@ -127,7 +129,9 @@ def send_message(ws_uri, message_list):
 def control():
     try:
         global ws_uri, message_list
-        
+        remote_ip = request.remote_addr
+        if not is_private_ip(remote_ip):
+            return jsonify({'status': False, 'message': 'Unauthorized access from public network'}), 403
         # 인증이 수행되지 않은 경우, 인증 수행
         if 'ws_uri' not in globals() or ws_uri is None:
             print("Re-authenticating...")
@@ -149,6 +153,10 @@ def control():
 @app.route('/control/<action>/<device_id>', methods=['GET'])
 def control_action(action, device_id):
     try:
+        remote_ip = request.remote_addr
+        if not is_private_ip(remote_ip):
+            return jsonify({'status': False, 'message': 'Unauthorized access from public network'}), 403
+        
         # action이 'on' 또는 'off'가 아닌 경우, 에러 메시지 반환
         if action not in ['on', 'off']:
             return jsonify({'status': False, 'message': 'Invalid action provided'}), 400
@@ -182,6 +190,23 @@ def control_action(action, device_id):
     except Exception as e:
         return jsonify({'status': False, 'message': 'Unknown error occurred during control action.', 'error': str(e)}), 500
         
+def is_private_ip(ip):
+    private_ranges = [
+        ("10.0.0.0", "10.255.255.255"),
+        ("172.16.0.0", "172.31.255.255"),
+        ("192.168.0.0", "192.168.255.255"),
+        ("127.0.0.0", "127.255.255.255"),
+    ]
+    ip_int = ip_to_int(ip)
+    for start, end in private_ranges:
+        if ip_int >= ip_to_int(start) and ip_int <= ip_to_int(end):
+            return True
+    return False
+
+# Function to convert IP address to integer
+def ip_to_int(ip):
+    parts = ip.split('.')
+    return (int(parts[0]) << 24) + (int(parts[1]) << 16) + (int(parts[2]) << 8) + int(parts[3])
 
 if __name__ == '__main__':
     app.run(debug=True)

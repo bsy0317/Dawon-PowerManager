@@ -13,7 +13,7 @@ def on_exit(server):
     console.print("[bold red]Server exit...[/bold red]")
     
 # Gunicorn 설정
-bind = '0.0.0.0:6000'  # 서버가 수신 대기할 주소와 포트
+bind = '0.0.0.0:5001'  # 서버가 수신 대기할 주소와 포트
 workers = multiprocessing.cpu_count() * 2 + 1
 
 worker_class = 'sync'

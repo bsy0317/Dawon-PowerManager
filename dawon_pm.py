@@ -33,6 +33,25 @@ put_headers = {
     'User-Agent': 'DawondnsOPI/121 CFNetwork/1492.0.1 Darwin/23.3.0'
 }
 
+# 환경변수를 확인하여 설정되어 있다면 settings.ini 파일에 덮어씌우는 함수
+def update_settings():
+    import os
+    user_id = os.getenv('user_id')
+    sso_token = os.getenv('sso_token')
+    terminal_id = os.getenv('terminal_id')
+    connected_ap = os.getenv('connected_ap')
+    if user_id and sso_token and terminal_id and connected_ap:
+        config = configparser.ConfigParser()
+        config.read('settings.ini')
+        config.set('user_settings', 'user_id', user_id)
+        config.set('user_settings', 'sso_token', sso_token)
+        config.set('user_settings', 'terminal_id', terminal_id)
+        config.set('user_settings', 'connected_ap', connected_ap)
+        with open('settings.ini', 'w') as configfile:
+            config.write(configfile)
+            
+update_settings()   # Environment 변수를 settings.ini 파일에 덮어씌움
+
 # 인증을 수행하는 함수
 def authenticate(only_authenticate_cookie=False):
     # settings.ini 에서 사용자 정보를 읽어옴

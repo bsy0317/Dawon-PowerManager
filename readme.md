@@ -4,7 +4,13 @@
 **Firmware 버전 1.01.34**에서 **B530-W, B540-W** 기기로 테스트되었습니다.  
 
 ## Prerequisites 🛠️
-Packet Capture를 통해 `user_id`, `sso_token`, `terminal_id`, `user_ssid_info` 값을 추출해야 합니다.   
+- Packet Capture를 통해 `user_id`, `sso_token`, `terminal_id`, `user_ssid_info` 값을 추출해야 합니다.   
+
+## Configuration ⚙️
+
+- 프로젝트 디렉토리에 `settings.ini` 파일이 필요합니다.  
+- `settings.ini` 파일은 `settings_sample.ini` 파일을 참고하여 작성합니다.  
+- **Note)** Docker를 사용할 경우 환경변수로 대체할 수 있습니다.  
 
 ## Android 🌌 
 
@@ -49,10 +55,6 @@ Packet Capture를 통해 `user_id`, `sso_token`, `terminal_id`, `user_ssid_info`
     pip install -r requirements.txt
     ```
 
-## Configuration ⚙️
-
-프로젝트 디렉토리에 `settings.ini` 파일이 필요합니다. `settings.ini` 파일은 `settings_sample.ini` 파일을 참고하여 작성하시면 됩니다.
-
 
 ## Usage 📒
 
@@ -68,6 +70,22 @@ run_windows.bat
 1. `run_linux.sh` 스크립트를 실행합니다.
 ```bash
 ./run_linux.sh
+```
+
+### Docker 🐋
+
+1. `docker pull westkite/dawon_pm` 명령어로 이미지를 다운로드합니다.    
+2. 환경변수를 설정하여 settings.ini 파일을 대체할 수 있습니다.  
+3. 다음 명령어를 통해 컨테이너를 실행합니다.
+```bash
+docker run --hostname=dawon_pm_api  
+--name=dawon_pm  
+--env=user_id=YOUR_USER_ID  
+--env=sso_token=YOUR_SSO_TOKEN  
+--env=terminal_id=YOUR_TERMINAL_ID  
+--env=connected_ap=YOUR_CONNECTED_AP  
+--workdir=/app -p 5001:5001  
+-d westkite/dawon_pm:latest
 ```
 
 ## Endpoints 📡
